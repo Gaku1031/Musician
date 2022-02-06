@@ -21,33 +21,33 @@ import org.springframework.security.core.userdetails.UserDetails;
 import lombok.Data;
 
 @Entity
-@Table(name = "usr")
+@Table(name = "artist")
 @Data
-public class User extends AbstractEntity implements UserDetails, UserInf {
+public class Artist extends AbstractEntity implements UserDetails, ArtistInf {
     private static final long serialVersionUID = 1L;
 
     public enum Authority {
-        ROLE_USER, ROLE_ADMIN
+        ROLE_ARTIST
     };
 
-    public User() {
+    public Artist() {
         super();
     }
 
-    public User(String email, String name, String password, Authority authority) {
-        this.username = email;
+    public Artist(String email, String name, String password, Authority authority) {
+        this.artistname = email;
         this.name = name;
         this.password = password;
         this.authority = authority;
     }
 
     @Id
-    @SequenceGenerator(name = "usr_id_seq")
+    @SequenceGenerator(name = "artist_id_seq")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;
+    private Long artistId;
 
     @Column(nullable = false, unique = true)
-    private String username;
+    private String artistname;
 
     @Column(nullable = false)
     private String name;
