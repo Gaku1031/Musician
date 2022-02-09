@@ -35,15 +35,15 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.context.MessageSource;
 
 import com.example.musician.entity.Topic;
-import com.example.musician.entity.UserInf;
+import com.example.musician.entity.ArtistInf;
 import com.example.musician.form.TopicForm;
-import com.example.musician.form.UserForm;
+import com.example.musician.form.ArtistForm;
 import com.example.musician.repository.TopicRepository;
 import com.example.musician.entity.Favorite;
 import com.example.musician.form.FavoriteForm;
 
 @Controller
-public class TopicsController {
+public class TopicsControllerArtist {
 
 	@Autowired
 	private MessageSource messageSource;
@@ -65,12 +65,12 @@ public class TopicsController {
     @GetMapping(path = "/topics")
     public String index(Principal principal, Model model) throws IOException {
         Authentication authentication = (Authentication) principal;
-        UserInf user = (UserInf) authentication.getPrincipal();
+        ArtistInf artist = (ArtistInf) authentication.getPrincipal();
 
         Iterable<Topic> topics = repository.findAllByOrderByUpdatedAtDesc();
         List<TopicForm> list = new ArrayList<>();
         for (Topic entity : topics) {
-            TopicForm form = getTopic(user, entity);
+            TopicForm form = getTopic(artist, entity);
             list.add(form);
         }
         model.addAttribute("list", list);
@@ -78,9 +78,9 @@ public class TopicsController {
         return "topics/index";
     }
 
-    public TopicForm getTopic(UserInf user, Topic entity) throws FileNotFoundException, IOException {
+    public TopicForm getTopic(ArtistInf artist, Topic entity) throws FileNotFoundException, IOException {
         modelMapper.getConfiguration().setAmbiguityIgnored(true);
-        modelMapper.typeMap(Topic.class, TopicForm.class).addMappings(mapper -> mapper.skip(TopicForm::setUser));
+        modelMapper.typeMap(Topic.class, TopicForm.class).addMappings(mapper -> mapper.skip(TopicForm::setArtist));
         modelMapper.typeMap(Topic.class, TopicForm.class).addMappings(mapper -> mapper.skip(TopicForm::setFavorites));
         modelMapper.typeMap(Favorite.class, FavoriteForm.class).addMappings(mapper -> mapper.skip(FavoriteForm::setTopic));
 
@@ -108,14 +108,14 @@ public class TopicsController {
             }
         }
 
-        UserForm userForm = modelMapper.map(entity.getUser(), UserForm.class);
-        form.setUser(userForm);
-        
+        ArtistForm artistForm = modelMapper.map(entity.getArtist(), ArtistForm.class);
+        form.setArtist(artistForm);
+
         List<FavoriteForm> favorites = new ArrayList<FavoriteForm>();
         for (Favorite favoriteEntity : entity.getFavorites()) {
         	FavoriteForm favorite = modelMapper.map(favoriteEntity, FavoriteForm.class);
         	favorites.add(favorite);
-        	if (user.getUserId().equals(favoriteEntity.getUserId())) {
+        	if (artist.getArtistId().equals(favoriteEntity.getArtistId())) {
         		form.setFavorite(favorite);
         	}
         }
@@ -149,12 +149,12 @@ public class TopicsController {
 
     @RequestMapping(value = "/topic", method = RequestMethod.POST)
     public String create(Principal principal, @Validated @ModelAttribute("form") TopicForm form, BindingResult result,
-    		 Model model, @RequestParam MultipartFile image, RedirectAttributes redirAttrs, Locale locale)
+    		Model model, @RequestParam MultipartFile image, RedirectAttributes redirAttrs, Locale locale)
             throws IOException {
         if (result.hasErrors()) {
             model.addAttribute("hasMessage", true);
             model.addAttribute("class", "alert-danger");
-            model.addAttribute("message", messageSource.getMessage("topics.create.flash.1", new String[] {}, locale));
+            model.addAttribute("message", messageSource.getMessage("topics.create.flash.1", new String[] {}, locale));           
             return "topics/new";
         }
 
@@ -165,8 +165,8 @@ public class TopicsController {
 
         Topic entity = new Topic();
         Authentication authentication = (Authentication) principal;
-        UserInf user = (UserInf) authentication.getPrincipal();
-        entity.setUserId(user.getUserId());
+        ArtistInf artist = (ArtistInf) authentication.getPrincipal();
+        entity.setArtistId(artist.getArtistId());
         File destFile = null;
         if (isImageLocal) {
             destFile = saveImageLocal(image, entity);
@@ -180,6 +180,7 @@ public class TopicsController {
         redirAttrs.addFlashAttribute("hasMessage", true);
         redirAttrs.addFlashAttribute("class", "alert-info");
         redirAttrs.addFlashAttribute("message", messageSource.getMessage("topics.create.flash.2", new String[] {}, locale));
+
         return "redirect:/topics";
     }
 
@@ -198,5 +199,4 @@ public class TopicsController {
 
         return destFile;
     }
-
 }

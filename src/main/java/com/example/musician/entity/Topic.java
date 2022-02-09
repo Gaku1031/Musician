@@ -12,6 +12,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.OneToMany;
 
 import lombok.Data;
 
@@ -48,6 +49,11 @@ public class Topic extends AbstractEntity implements Serializable {
     @JoinColumn(name = "userId", insertable = false, updatable = false)
     private User user;
     
+    @OneToOne
     @JoinColumn(name = "artistId", insertable = false, updatable = false)
     private Artist artist;
+    
+    @OneToMany
+    @JoinColumn(name = "topicId", insertable = false, updatable = false)
+    private List<Favorite> favorites;
 }

@@ -20,6 +20,7 @@ public class TopicForm {
     
     private Long artistId;
 
+
     @ImageByte(max = 2000000000)
     private MultipartFile image;
 
@@ -32,7 +33,10 @@ public class TopicForm {
     private String description;
 
     private UserForm user;
-    
-    private UserForm artist;
 
+    private ArtistForm artist;
+    
+    private List<FavoriteForm> favorites;
+
+    private FavoriteForm favorite;
 }
