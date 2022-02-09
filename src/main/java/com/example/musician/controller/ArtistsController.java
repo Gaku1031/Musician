@@ -33,7 +33,7 @@ public class ArtistsController {
         return "artists/new";
     }
 
-    @RequestMapping(value = "/user", method = RequestMethod.POST)
+    @RequestMapping(value = "/artist", method = RequestMethod.POST)
     public String create(@Validated @ModelAttribute("form") UserForm form, BindingResult result, Model model, RedirectAttributes redirAttrs) {
         String name = form.getName();
         String email = form.getEmail();
